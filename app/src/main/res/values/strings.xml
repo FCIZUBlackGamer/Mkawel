@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Mkawel</string>
+    <string name="hello_msg1">اختر الأن الصانع المناسب لك وسط اللاف مع المقاول</string>
+    <string name="hello_msg2">نساعد لاختيار الأنسب والأفضل بناء على تقييم المستخدمين</string>
+    <string name="hello_msg3">قم الأن بتسجيل حساب وأبدأ مشروعك أو سجل دخول</string>
+    <string name="hello_msg4">للمتابعه ونشر المزيدمن المشاريع</string>
+    <string name="login">تسجيل دخول</string>
+    <string name="register">تسجيل حساب جديد</string>
+    <string name="user_name">اسم المستخدم</string>
+    <string name="password">كلمه مرور</string>
+    <string name="forgot">نسيت كلمة المرور؟</string>
+    <string name="phone">رقم الهاتف</string>
+    <string name="address">العنوان</string>
+    <string name="have_account">لديك حساب بالفعل؟</string>
+</resources>
