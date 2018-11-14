@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/user_image"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_gravity="center"
+            android:src="@drawable/logo" />
+
+        <TextView
+            android:id="@+id/user_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="10dp"
+            android:gravity="center"
+            android:text="Mo'men Shaheen"
+            android:textColor="#fff"
+            android:textStyle="bold" />
+
+        <RatingBar
+            android:id="@+id/user_rate"
+            style="@style/Base.Widget.AppCompat.RatingBar.Indicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginStart="1dp"
+            android:isIndicator="true"
+            android:numStars="5"
+            android:progressTint="@color/orange"
+            android:rating="3"
+            android:stepSize="1" />
+
+        <EditText
+            android:layout_width="290dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="20dp"
+            android:id="@+id/deal_name"
+            android:background="@drawable/edittext_background"
+            android:hint="@string/name"
+            android:padding="6dp" />
+
+        <LinearLayout
+            android:layout_width="290dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="20dp"
+            android:orientation="horizontal">
+
+            <EditText
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="5dp"
+                android:layout_weight="1"
+                android:id="@+id/deal_cost"
+                android:background="@drawable/edittext_background"
+                android:gravity="start"
+                android:hint="@string/cost"
+                android:padding="6dp" />
+
+            <EditText
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="20dp"
+                android:layout_weight="1"
+                android:id="@+id/deal_duration"
+                android:background="@drawable/edittext_background"
+                android:hint="@string/duration"
+                android:padding="6dp" />
+
+        </LinearLayout>
+
+        <EditText
+            android:layout_width="290dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/edittext_background"
+            android:gravity="top"
+            android:hint="@string/description"
+            android:lines="7"
+            android:id="@+id/deal_desc"
+            android:maxLines="25"
+            android:padding="6dp" />
+
+        <LinearLayout
+            android:layout_width="290dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="20dp"
+            android:layout_gravity="center_horizontal"
+            android:background="@color/orange">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_margin="10dp"
+                android:gravity="center"
+                android:text="@string/rate_deal"
+                android:textColor="#fff"
+                android:textStyle="bold" />
+
+            <RatingBar
+                android:id="@+id/deal_rate"
+                style="@style/Base.Widget.AppCompat.RatingBar.Indicator"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginStart="1dp"
+                android:isIndicator="false"
+                android:numStars="5"
+                android:progressTint="@color/colorPrimary"
+                android:rating="3"
+                android:stepSize="1" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="290dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="20dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="10dp"
+                android:background="#9377d8"
+                android:text="@string/post"
+                android:textColor="#fff"
+                android:id="@+id/confirm"
+                android:layout_marginEnd="5dp"
+                android:layout_marginBottom="10dp"/>
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_marginStart="5dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="10dp"
+                android:background="#9377d8"
+                android:id="@+id/cancel"
+                android:visibility="invisible"
+                android:text="@string/cancel_deal"
+                android:textColor="#fff"
+                android:layout_marginBottom="10dp"/>
+
+        </LinearLayout>
+
+
+
+    </LinearLayout>
+</android.support.v4.widget.NestedScrollView>

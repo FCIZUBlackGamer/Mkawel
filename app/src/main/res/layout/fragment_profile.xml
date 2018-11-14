@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/colorPrimary">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_gravity="center"
+            android:src="@drawable/logo"
+            android:id="@+id/user_image"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:id="@+id/user_name"
+            android:text="Mo'men Shaheen"
+            android:textColor="#fff"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="Senior Android Developer"
+            android:textColor="#fff"
+            android:id="@+id/user_job"
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:gravity="center"
+            android:id="@+id/user_phone"
+            android:layout_gravity="center"
+            android:text="01020118856"
+            android:textColor="#fff"
+            android:textStyle="bold" />
+
+        <RatingBar
+            android:id="@+id/user_rate"
+            style="@style/Base.Widget.AppCompat.RatingBar.Indicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginStart="1dp"
+            android:isIndicator="true"
+            android:numStars="5"
+            android:rating="3"
+            android:progressTint="@color/orange"
+            android:stepSize="1" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="@string/available_dep"
+            android:textColor="#fff"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center_horizontal">
+            <android.support.design.widget.FloatingActionButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:backgroundTint="@color/orange"
+                android:layout_marginEnd="40dp"
+                android:id="@+id/make_deal"
+                android:src="@drawable/ic_add_black_24dp"
+                app:elevation="4dp"/>
+
+            <android.support.design.widget.FloatingActionButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:backgroundTint="@color/orange"
+                android:layout_marginStart="40dp"
+                android:id="@+id/call"
+                android:src="@drawable/ic_local_phone_black_24dp"
+                app:elevation="4dp"/>
+        </LinearLayout>
+
+
+        <mkawel.fci.com.mkawel.Employee.ExpandableHeightGridView
+            android:id="@+id/cat_grid"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:columnWidth="180dp"
+            android:isScrollContainer="false"
+            android:numColumns="auto_fit">
+
+        </mkawel.fci.com.mkawel.Employee.ExpandableHeightGridView>
+
+    </LinearLayout>
+</ScrollView>

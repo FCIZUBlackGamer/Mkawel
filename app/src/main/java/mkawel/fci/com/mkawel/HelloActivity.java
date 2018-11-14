@@ -20,6 +20,6 @@ public class HelloActivity extends AppCompatActivity {
                 startActivity(mainIntent);
                 HelloActivity.this.finish();
             }
-        }, 60);
+        }, 3000);
     }
 }

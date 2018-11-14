@@ -12,4 +12,88 @@
     <string name="phone">رقم الهاتف</string>
     <string name="address">العنوان</string>
     <string name="have_account">لديك حساب بالفعل؟</string>
+    <string name="name">اسم المشروع</string>
+    <string name="duration">المدة</string>
+    <string name="cost">التكلفة</string>
+    <string name="description">وصف المشروع</string>
+    <string name="post">تأكيد الصفقة</string>
+    <string name="rate_deal">تقييم الصفقة</string>
+    <string name="cancel_deal">إلغاء الصفقة</string>
+    <string name="with">بواسطة :</string>
+    <string name="start_deal">ابدأ صفقة</string>
+    <string name="most_used">--- Most used categories</string>
+    <string name="available_dep">--- Available categories</string>
+    <string name="title_activity_nav">NavActivity</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+    <string name="home">Home</string>
+    <string name="myprojects">My projects</string>
+    <string name="nearest">Nearest</string>
+    <string name="logout">Logout</string>
+    <string name="action_search_for_cat">بحث عن قسم</string>
+    <string name="action_search_for_employee">بحث عن عامل</string>
+    <string name="email">البريد الإلكترونى</string>
+
+    <!--<string-array name="citys">-->
+    <!--<item>Alexandria</item>-->
+    <!--<item>Aswan</item>-->
+    <!--<item>Asyut</item>-->
+    <!--<item>Beheira</item>-->
+    <!--<item>Beni Suef</item>-->
+    <!--<item>Cairo</item>-->
+    <!--<item>Dakahlia</item>-->
+    <!--<item>Damietta</item>-->
+    <!--<item>Faiyum</item>-->
+    <!--<item>Gharbia</item>-->
+    <!--<item>Giza</item>-->
+    <!--<item>Ismailia</item>-->
+    <!--<item>Kafr El Sheikh</item>-->
+    <!--<item>Luxor</item>-->
+    <!--<item>Matruh</item>-->
+    <!--<item>Minya</item>-->
+    <!--<item>Monufia</item>-->
+    <!--<item>New Valley</item>-->
+    <!--<item>North Sinai</item>-->
+    <!--<item>Port Said</item>-->
+    <!--<item>Qalyubia</item>-->
+    <!--<item>Qena</item>-->
+    <!--<item>Red Sea</item>-->
+    <!--<item>Sharqia</item>-->
+    <!--<item>Sohag</item>-->
+    <!--<item>South Sinai</item>-->
+    <!--<item>Suez</item>-->
+    <!--</string-array>-->
+    <string-array name="citys">
+        <item>اسكندريه</item>
+        <item>أسوان</item>
+        <item>أسيوط</item>
+        <item>بحيرة</item>
+        <item>بني سويف</item>
+        <item>القاهرة</item>
+        <item>الدقهلية</item>
+        <item>دمياط</item>
+        <item>الفيوم</item>
+        <item>غربيه</item>
+        <item>الجيزة</item>
+        <item>الاسماعيليه</item>
+        <item>كفر الشيخ</item>
+        <item>الأقصر</item>
+        <item>مطروح</item>
+        <item>المنيا</item>
+        <item>المنوفية</item>
+        <item>الوادي الجديد</item>
+        <item>شمال سيناء</item>
+        <item>بورسعيد</item>
+        <item>القليوبية</item>
+        <item>قنا</item>
+        <item>البحر الأحمر</item>
+        <item>الشرقية</item>
+        <item>سوهاج</item>
+        <item>جنوب سيناء</item>
+        <item>السويس</item>
+    </string-array>
 </resources>
