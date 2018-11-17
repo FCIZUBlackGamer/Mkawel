@@ -31,6 +31,14 @@ public class FragmentHome extends Fragment {
     View view;
 
     FragmentManager fragmentManager;
+    static int catId = -1;
+
+    public static FragmentHome catOrEmployee(int Id){
+        FragmentHome home = new FragmentHome();
+        catId = Id;
+        return home;
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -51,6 +59,40 @@ public class FragmentHome extends Fragment {
     public void onStart() {
         super.onStart();
 
+        if (catId != -1){
+            loadEmployees(catId);
+        }else {
+            loadCategorys();
+        }
+
+
+
+
+    }
+
+    private void loadEmployees(int catId) {
+        for (int x=0; x<10; x++){
+            Category category = new Category(x+1,
+                    12,
+                    "Ahmed");
+            category.setRate(3.5f);
+            categories.add(category);
+        }
+
+        categoryAdapter = new CategoryAdapter(getActivity(), categories, 1);
+        gridView.setAdapter(categoryAdapter);
+//        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//
+//                Category c = categories.get(position);
+//                Log.e("Id",c.getId()+"");
+//
+//            }
+//        });
+    }
+
+    private void loadCategorys() {
         for (int x=0; x<10; x++){
             Category category = new Category(x+1,
                     12,
@@ -58,19 +100,16 @@ public class FragmentHome extends Fragment {
             categories.add(category);
         }
 
-        categoryAdapter = new CategoryAdapter(getActivity(), categories);
+        categoryAdapter = new CategoryAdapter(getActivity(), categories, 0);
         gridView.setAdapter(categoryAdapter);
-        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                Category c = categories.get(position);
-                Log.e("Id",c.getId()+"");
-
-            }
-        });
-
-
-
+//        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//
+//                Category c = categories.get(position);
+//                Log.e("Id",c.getId()+"");
+//
+//            }
+//        });
     }
 }

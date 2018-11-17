@@ -8,11 +8,20 @@ public class Category implements Serializable {
     String Name;
     String Image;
     String Description;
+    float rate;
 
     public Category(int id, int numProjects, String name) {
         Id = id;
         this.numProjects = numProjects;
         Name = name;
+    }
+
+    public void setRate(float rate) {
+        this.rate = rate;
+    }
+
+    public float getRate() {
+        return rate;
     }
 
     public void setName(String name) {

@@ -30,7 +30,15 @@ public class FragmentProfile extends Fragment {
 
     FloatingActionButton call, makeDeal;
     FragmentManager fragmentManager;
+    static int Id = -1; // 0 is user, 1 is employee
+    static int EmployeeId = 0;
 
+    public static FragmentProfile userOrEmployee(int type, int employeId){
+        FragmentProfile profile = new FragmentProfile();
+        Id = type;
+        EmployeeId = employeId;
+        return profile;
+    }
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -48,6 +56,38 @@ public class FragmentProfile extends Fragment {
     public void onStart() {
         super.onStart();
 
+        if(Id == 0){
+            gridView.setVisibility(View.GONE);
+            call.setVisibility(View.GONE);
+            makeDeal.setVisibility(View.GONE);
+            loadMyProfile();
+        }else {
+            gridView.setVisibility(View.VISIBLE);
+            call.setVisibility(View.VISIBLE);
+            makeDeal.setVisibility(View.VISIBLE);
+            loadEmployeeProfile(EmployeeId);
+        }
+
+
+//        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                Project c = categories.get(position);
+////                fragmentManager.beginTransaction()
+////                        .replace(R.id.frame_home, new FragmentProductDetails().setId(book.getId(),0)).addToBackStack("FragmentOfferDetails").commit();
+//
+//            }
+//        });
+
+        makeDeal.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                fragmentManager.beginTransaction().replace(R.id.home_frame, new FragmentMakeDeal()).commit();
+            }
+        });
+    }
+
+    private void loadEmployeeProfile(int employeeId) {
         for (int x=0; x<10; x++){
             Project category = new Project();
             category.setId(x+1);
@@ -59,22 +99,9 @@ public class FragmentProfile extends Fragment {
 
         projectAdapter = new ProjectAdapter(getActivity(), categories);
         gridView.setAdapter(projectAdapter);
-//        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                Project c = categories.get(position);
-////                fragmentManager.beginTransaction()
-////                        .replace(R.id.frame_home, new FragmentProductDetails().setId(book.getId(),0)).addToBackStack("FragmentOfferDetails").commit();
-//
-//            }
-//        });
+    }
 
-
-        makeDeal.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                fragmentManager.beginTransaction().replace(R.id.home_frame, new FragmentMakeDeal()).commit();
-            }
-        });
+    private void loadMyProfile() {
+        // display basic information
     }
 }

@@ -123,7 +123,7 @@ public class RegisterActivity extends AppCompatActivity {
                 final ProgressDialog progressDialog = new ProgressDialog(RegisterActivity.this);
                 progressDialog.setMessage("Registering");
                 progressDialog.show();
-                StringRequest stringRequest = new StringRequest(Request.Method.POST, "http://192.168.1.2/mkawel/Register.php", new Response.Listener<String>() {
+                StringRequest stringRequest = new StringRequest(Request.Method.POST, "http://abdelkreimahmed.000webhostapp.com/mkawel/Register.php", new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
                         Log.e("Response",response);
