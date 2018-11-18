@@ -11,6 +11,7 @@
     <string name="forgot">نسيت كلمة المرور؟</string>
     <string name="phone">رقم الهاتف</string>
     <string name="address">العنوان</string>
+    <string name="other">أخرى</string>
     <string name="have_account">لديك حساب بالفعل؟</string>
     <string name="name">اسم المشروع</string>
     <string name="duration">المدة</string>

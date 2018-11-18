@@ -10,6 +10,11 @@ public class Category implements Serializable {
     String Description;
     float rate;
 
+    public Category(int id, String name) {
+        Id = id;
+        Name = name;
+    }
+
     public Category(int id, int numProjects, String name) {
         Id = id;
         this.numProjects = numProjects;

@@ -10,34 +10,44 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.NetworkError;
 import com.android.volley.Request;
+import com.android.volley.RequestQueue;
 import com.android.volley.Response;
+import com.android.volley.RetryPolicy;
 import com.android.volley.ServerError;
 import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -45,15 +55,18 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class RegisterActivity extends AppCompatActivity {
 
     TextView login;
-    EditText user_name, email, password, phone, address;
+    EditText user_name, email, password, phone, address, other_cat;
     Button register;
-    Spinner cap;
+    Spinner cap, category;
     CircleImageView user_image;
     private int PICK_IMAGE_REQUEST = 1;
     final int CAMERA_PIC_REQUEST = 1337;
     private static final int CAMERA_REQUEST = 1888;
     String final_iamge;
     Bitmap bitmap;
+    List<Spin> spinList;
+    List<String> stringList;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,10 +77,13 @@ public class RegisterActivity extends AppCompatActivity {
         address = findViewById(R.id.address);
         register = findViewById(R.id.register);
         cap = findViewById(R.id.cap);
+        category = findViewById(R.id.category);
         email = findViewById(R.id.email);
+        other_cat = findViewById(R.id.other_cat);
         login = findViewById(R.id.login);
         user_image = findViewById(R.id.user_image);
 
+        requestStoragePermission();
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -75,6 +91,7 @@ public class RegisterActivity extends AppCompatActivity {
             }
         });
 
+        loadSpinnerData();
         user_image.setOnClickListener(new View.OnClickListener() {
             @SuppressLint("ResourceAsColor")
             @Override
@@ -111,7 +128,6 @@ public class RegisterActivity extends AppCompatActivity {
                 });
 
 
-
             }
         });
 
@@ -121,42 +137,52 @@ public class RegisterActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 final ProgressDialog progressDialog = new ProgressDialog(RegisterActivity.this);
-                progressDialog.setMessage("Registering");
+                progressDialog.setMessage("تسجيل مستخدم ...");
                 progressDialog.show();
-                StringRequest stringRequest = new StringRequest(Request.Method.POST, "http://abdelkreimahmed.000webhostapp.com/mkawel/Register.php", new Response.Listener<String>() {
+                StringRequest stringRequest = new StringRequest(Request.Method.POST, "http://abdelkreimahmed.000webhostapp.com/Register.php", new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        Log.e("Response",response);
+                        Log.e("Response", response);
                         progressDialog.dismiss();
+                        try {
+                            JSONObject object = new JSONObject(response);
+                            if (!object.getBoolean("error")){
+                                Toast.makeText(RegisterActivity.this, "تم التسجيل بنجاح", Toast.LENGTH_SHORT).show();
+                                startActivity(new Intent(RegisterActivity.this,LoginActivity.class));
+                            }else {
+                                Toast.makeText(RegisterActivity.this, object.getString("message"), Toast.LENGTH_SHORT).show();
+                            }
+                        }catch (Exception e){
+
+                            Toast.makeText(RegisterActivity.this, "خطأ فى صيغة الاستقبال", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         progressDialog.dismiss();
                         if (error instanceof ServerError)
-//                            text.setText("خطأ فى الاتصال بالخادم");
-                            Log.e("Err",error.getMessage().toString());
+                            Toast.makeText(RegisterActivity.this, "خطأ فى الاتصال بالخادم", Toast.LENGTH_SHORT).show();
                         else if (error instanceof TimeoutError)
-//                            text.setText("خطأ فى مدة الاتصال");
-                            Log.e("Err",error.getMessage().toString());
+                            Toast.makeText(RegisterActivity.this, "خطأ فى مدة الاتصال", Toast.LENGTH_SHORT).show();
                         else if (error instanceof NetworkError)
-//                            text.setText("شبكه الانترنت ضعيفه حاليا");
-                            Log.e("Err",error.getMessage().toString());
+                            Toast.makeText(RegisterActivity.this, "شبكه الانترنت ضعيفه حاليا", Toast.LENGTH_SHORT).show();
                     }
-                }){
+                }) {
                     @Override
                     protected Map<String, String> getParams() throws AuthFailureError {
                         HashMap<String, String> map = new HashMap<>();
                         map.put("Content-Type", "application/json; charset=utf-8");
-                        map.put("user_name",user_name.getText().toString());
-                        map.put("email",email.getText().toString());
-                        map.put("password",password.getText().toString());
-                        map.put("phone",phone.getText().toString());
-                        map.put("address",address.getText().toString());
-                        map.put("capital",cap.getSelectedItem().toString());
-                        map.put("longitude",231564.54+"");
-                        map.put("latitude",231564.54+"");
-                        map.put("userImage",final_iamge);
+                        map.put("user_name", user_name.getText().toString());
+                        map.put("email", email.getText().toString());
+                        map.put("password", password.getText().toString());
+                        map.put("phone", phone.getText().toString());
+                        map.put("address", address.getText().toString());
+                        map.put("capital", cap.getSelectedItem().toString());
+                        map.put("cat", cap.getSelectedItem().toString());
+                        map.put("longitude", 231564.54 + "");
+                        map.put("latitude", 231564.54 + "");
+                        map.put("userImage", final_iamge);
                         return map;
                     }
                 };
@@ -168,6 +194,50 @@ public class RegisterActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+
+    private void loadSpinnerData() {
+
+        final RequestQueue requestQueue = Volley.newRequestQueue(RegisterActivity.this);
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, "http://abdelkreimahmed.000webhostapp.com/ListCat.php", new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+
+                try {
+                    JSONObject jsonObject = new JSONObject(response);
+                    JSONArray array = jsonObject.getJSONArray("CatUser");
+                    if (array.length()>0){
+                        stringList = new ArrayList<>();
+                        spinList = new ArrayList<>();
+                        for (int i = 0; i < array.length(); i++) {
+                            JSONObject jsonObject1 = array.getJSONObject(i);
+                            Spin spin = new Spin(jsonObject1.getInt("catId"), jsonObject1.getString("catName"));
+                            stringList.add(jsonObject1.getString("catName"));
+                            spinList.add(spin);
+                        }
+                    }
+                    stringList.add("أخرى");
+                    category.setAdapter(new ArrayAdapter<String>(RegisterActivity.this, android.R.layout.simple_spinner_dropdown_item, stringList));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                if (error instanceof ServerError)
+                    Toast.makeText(RegisterActivity.this, "خطأ فى الاتصال بالخادم", Toast.LENGTH_SHORT).show();
+                else if (error instanceof TimeoutError)
+                    Toast.makeText(RegisterActivity.this, "خطأ فى مدة الاتصال", Toast.LENGTH_SHORT).show();
+                else if (error instanceof NetworkError)
+                    Toast.makeText(RegisterActivity.this, "شبكه الانترنت ضعيفه حاليا", Toast.LENGTH_SHORT).show();
+            }
+        });
+        int socketTimeout = 30000;
+        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, 2, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        stringRequest.setRetryPolicy(policy);
+        requestQueue.add(stringRequest);
     }
 
     private void openGalary() {
@@ -205,22 +275,17 @@ public class RegisterActivity extends AppCompatActivity {
         Uri filePath;
 
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
-            filePath= data.getData();
+            filePath = data.getData();
             try {
                 //Getting the Bitmap from Gallery
                 bitmap = MediaStore.Images.Media.getBitmap(RegisterActivity.this.getContentResolver(), filePath);
-                //displayImage(bitmap, filePath);
                 user_image.setImageBitmap(bitmap);
-
                 final_iamge = getStringImage(bitmap);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }else if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK) {
+        } else if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK) {
             bitmap = (Bitmap) data.getExtras().get("data");
-//            filePath = null;
-            //displayImage(bitmap, filePath);
-//            imageView.setImageBitmap(photo);
             user_image.setImageBitmap(bitmap);
             final_iamge = getStringImage(bitmap);
         }
