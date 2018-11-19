@@ -50,24 +50,51 @@
             android:textColor="#fff"
             android:textStyle="bold" />
 
-        <RatingBar
-            android:id="@+id/user_rate"
-            style="@style/Base.Widget.AppCompat.RatingBar.Indicator"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginStart="1dp"
-            android:isIndicator="true"
-            android:numStars="5"
-            android:rating="3"
-            android:progressTint="@color/orange"
-            android:stepSize="1" />
+            android:orientation="horizontal">
+            <FrameLayout
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginStart="20dp">
+
+                <android.support.design.widget.FloatingActionButton
+                    android:layout_width="50dp"
+                    android:layout_height="50dp" />
+
+                <TextView
+                    android:id="@+id/num_projects"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:elevation="16dp"
+                    android:gravity="center"
+                    android:text="125"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="@android:color/white" />
+            </FrameLayout>
+
+            <RatingBar
+                android:id="@+id/user_rate"
+                style="@style/Base.Widget.AppCompat.RatingBar.Indicator"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="30dp"
+                android:isIndicator="true"
+                android:numStars="5"
+                android:rating="3"
+                android:progressTint="@color/orange"
+                android:stepSize="1" />
+        </LinearLayout>
+
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
-            android:text="@string/available_dep"
+            android:text="@string/user_projects"
             android:textColor="#fff"
             android:textStyle="bold" />
 
