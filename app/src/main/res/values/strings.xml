@@ -37,6 +37,7 @@
     <string name="action_search_for_cat">بحث عن قسم</string>
     <string name="action_search_for_employee">بحث عن عامل</string>
     <string name="email">البريد الإلكترونى</string>
+    <string name="user_projects">مشاريع قام بتنفيذها</string>
 
     <!--<string-array name="citys">-->
     <!--<item>Alexandria</item>-->
