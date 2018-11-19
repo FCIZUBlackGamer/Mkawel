@@ -1,7 +1,6 @@
 package mkawel.fci.com.mkawel.Home;
 
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -35,7 +34,6 @@ import java.util.List;
 import java.util.Map;
 
 import mkawel.fci.com.mkawel.Deal.FragmentListDeals;
-import mkawel.fci.com.mkawel.LoginActivity;
 import mkawel.fci.com.mkawel.R;
 import mkawel.fci.com.mkawel.RegisterActivity;
 
@@ -49,8 +47,6 @@ public class FragmentHome extends Fragment {
     GridView gridView;
     CategoryAdapter categoryAdapter;
     List<Category> categories;
-    List<String> names;
-    List<Integer> num;
     View view;
 
     FragmentManager fragmentManager;
@@ -93,37 +89,37 @@ public class FragmentHome extends Fragment {
 
     }
 
-    private void loadEmployees(int catId) {
-
+    /**
+     * http://abdelkreimahmed.000webhostapp.com/ListUsersInCat.php
+     * */
+    private void loadEmployees(final int catId) {
         final ProgressDialog progressDialog = new ProgressDialog(getActivity());
-        progressDialog.setMessage("جارى تحميل بيانات العمال ...");
+        progressDialog.setMessage("جارى تحميل الاقسام ...");
         progressDialog.show();
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, "http://abdelkreimahmed.000webhostapp.com/ListCat.php", new Response.Listener<String>() {
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, "http://abdelkreimahmed.000webhostapp.com/ListUsersInCat.php", new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                Log.e("Response", response);
+                Log.e("Response",response);
                 progressDialog.dismiss();
                 try {
                     JSONObject object = new JSONObject(response);
-                    JSONArray array = object.getJSONArray("realData");
+                    JSONArray array = object.getJSONArray("data");
                     if (array.length() > 0){
-                        categories = new ArrayList<>();
-
-                        for (int x=0; x<array.length(); x++){
-                            JSONObject jsonObject = array.getJSONObject(x);
-                            Category category = new Category(jsonObject.getInt("catId"),
-                                    jsonObject.getString("catName"));
+                        for (int x=0; x<10; x++){
+                            JSONObject object1 = array.getJSONObject(x);
+                            Category category = new Category(object1.getInt("catId"),
+                                    object1.getInt("numUsers"),
+                                    object1.getString("catName"));
+                            category.setRate((float) object1.getDouble("rate"));
                             categories.add(category);
                         }
-
+                        categoryAdapter = new CategoryAdapter(getActivity(), categories, 1);
+                        gridView.setAdapter(categoryAdapter);
                     }else {
-                        Toast.makeText(getActivity(), "لا توجد بيانات للعمال", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(),"لا توجد اقسام حاليا", Toast.LENGTH_SHORT).show();
                     }
-
-
                 }catch (Exception e){
-
-                    Toast.makeText(getActivity(), "خطأ فى صيغة الاستقبال", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(),"صيغه استقبال غير صحيحه", Toast.LENGTH_SHORT).show();
                 }
             }
         }, new Response.ErrorListener() {
@@ -131,45 +127,30 @@ public class FragmentHome extends Fragment {
             public void onErrorResponse(VolleyError error) {
                 progressDialog.dismiss();
                 if (error instanceof ServerError)
-                    Toast.makeText(getActivity(), "خطأ فى الاتصال بالخادم", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(),"خطأ فى الاتصال بالخادم", Toast.LENGTH_SHORT).show();
                 else if (error instanceof TimeoutError)
-                    Toast.makeText(getActivity(), "خطأ فى مدة الاتصال", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(),"خطأ فى مدة الاتصال", Toast.LENGTH_SHORT).show();
                 else if (error instanceof NetworkError)
-                    Toast.makeText(getActivity(), "شبكه الانترنت ضعيفه حاليا", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(),"شبكه الانترنت ضعيفه حاليا", Toast.LENGTH_SHORT).show();
             }
-        });
+        }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                HashMap<String, String> map = new HashMap<>();
+                map.put("catId",catId+"");
+                return map;
+            }
+        };
         stringRequest.setRetryPolicy(new DefaultRetryPolicy(
                 DefaultRetryPolicy.DEFAULT_TIMEOUT_MS,
                 3,  // maxNumRetries = 2 means no retry
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         Volley.newRequestQueue(getActivity()).add(stringRequest);
-
-
-        categoryAdapter = new CategoryAdapter(getActivity(), categories, 0);
-        gridView.setAdapter(categoryAdapter);
-
-
-        for (int x=0; x<10; x++){
-            Category category = new Category(x+1,
-                    12,
-                    "Ahmed");
-            category.setRate(3.5f);
-            categories.add(category);
-        }
-
-        categoryAdapter = new CategoryAdapter(getActivity(), categories, 1);
-        gridView.setAdapter(categoryAdapter);
-//        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//
-//                Category c = categories.get(position);
-//                Log.e("Id",c.getId()+"");
-//
-//            }
-//        });
     }
 
+    /**
+     * http://abdelkreimahmed.000webhostapp.com/ListCat.php
+     * */
     private void loadCategorys() {
         final ProgressDialog progressDialog = new ProgressDialog(getActivity());
         progressDialog.setMessage("جارى تحميل الاقسام ...");
@@ -177,48 +158,26 @@ public class FragmentHome extends Fragment {
         StringRequest stringRequest = new StringRequest(Request.Method.POST, "http://abdelkreimahmed.000webhostapp.com/ListCat.php", new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                Log.e("Response", response);
+                Log.e("Response",response);
                 progressDialog.dismiss();
                 try {
                     JSONObject object = new JSONObject(response);
-                    JSONArray array = object.getJSONArray("realData");
+                    JSONArray array = object.getJSONArray("CatUser");
                     if (array.length() > 0){
-                        categories = new ArrayList<>();
-
-                        for (int x=0; x<array.length(); x++){
-                            JSONObject jsonObject = array.getJSONObject(x);
-                            Category category = new Category(jsonObject.getInt("catId"),
-                                    jsonObject.getString("catName"));
+                        for (int x=0; x<10; x++){
+                            JSONObject object1 = array.getJSONObject(x);
+                            Category category = new Category(object1.getInt("catId"),
+                                    object1.getInt("numUsers"),
+                                    object1.getString("catName"));
                             categories.add(category);
                         }
-
+                        categoryAdapter = new CategoryAdapter(getActivity(), categories, 0);
+                        gridView.setAdapter(categoryAdapter);
                     }else {
-                        Toast.makeText(getActivity(), "لا توجد اقسام حاليا", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(),"لا توجد اقسام حاليا", Toast.LENGTH_SHORT).show();
                     }
-
-                    JSONArray name = object.getJSONArray("data");
-                    if (name.length() > 0){
-//                        names = new ArrayList<>();
-//                        num = new ArrayList<>();
-
-                        String[] arr = new String[name.length()];
-                        for(int i = 0; i < name.length(); i++)
-                            arr[i] = name.getString(i);
-
-                        for (int i = 0; i < arr.length; i++) {
-                            Log.e("Index"+i, arr[i]);
-                        }
-//                        for (int x=0; x<name.length(); x++){
-//                            JSONObject jsonObject = array.getJSONObject(x);
-//
-//                            names.add(jsonObject.getString("d"));
-//                        }
-
-                    }
-
                 }catch (Exception e){
-
-                    Toast.makeText(getActivity(), "خطأ فى صيغة الاستقبال", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(),"صيغه استقبال غير صحيحه", Toast.LENGTH_SHORT).show();
                 }
             }
         }, new Response.ErrorListener() {
@@ -226,11 +185,11 @@ public class FragmentHome extends Fragment {
             public void onErrorResponse(VolleyError error) {
                 progressDialog.dismiss();
                 if (error instanceof ServerError)
-                    Toast.makeText(getActivity(), "خطأ فى الاتصال بالخادم", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(),"خطأ فى الاتصال بالخادم", Toast.LENGTH_SHORT).show();
                 else if (error instanceof TimeoutError)
-                    Toast.makeText(getActivity(), "خطأ فى مدة الاتصال", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(),"خطأ فى مدة الاتصال", Toast.LENGTH_SHORT).show();
                 else if (error instanceof NetworkError)
-                    Toast.makeText(getActivity(), "شبكه الانترنت ضعيفه حاليا", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(),"شبكه الانترنت ضعيفه حاليا", Toast.LENGTH_SHORT).show();
             }
         });
         stringRequest.setRetryPolicy(new DefaultRetryPolicy(
@@ -238,18 +197,5 @@ public class FragmentHome extends Fragment {
                 3,  // maxNumRetries = 2 means no retry
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         Volley.newRequestQueue(getActivity()).add(stringRequest);
-
-
-        categoryAdapter = new CategoryAdapter(getActivity(), categories, 0);
-        gridView.setAdapter(categoryAdapter);
-//        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//
-//                Category c = categories.get(position);
-//                Log.e("Id",c.getId()+"");
-//
-//            }
-//        });
     }
 }

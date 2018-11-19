@@ -18,7 +18,13 @@ public class FragmentMakeDeal extends Fragment {
     EditText deal_name, deal_cost, deal_duration, deal_desc;
     RatingBar deal_rate;
     Button confirm, cancel;
+    static int employeeId = 0;
 
+    public static FragmentMakeDeal setId(int id){
+        FragmentMakeDeal fragmentMakeDeal = new FragmentMakeDeal();
+        employeeId = id;
+        return fragmentMakeDeal;
+    }
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -36,6 +42,7 @@ public class FragmentMakeDeal extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
+
 
     }
 }
