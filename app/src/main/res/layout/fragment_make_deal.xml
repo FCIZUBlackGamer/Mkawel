@@ -102,6 +102,8 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:layout_marginTop="20dp"
+            android:visibility="gone"
+            android:id="@+id/deal_layout"
             android:layout_gravity="center_horizontal"
             android:background="@color/orange">
             <TextView

@@ -59,6 +59,8 @@ public class FragmentProfile extends Fragment {
     static int Id = -1; // 0 is user, 1 is employee
     static int EmployeeId = 0;
     int employee_id = 0;
+    String Image, Name;
+    float userRate;
 
     public static FragmentProfile userOrEmployee(int type, int employeId){
         FragmentProfile profile = new FragmentProfile();
@@ -127,7 +129,7 @@ public class FragmentProfile extends Fragment {
         makeDeal.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                fragmentManager.beginTransaction().replace(R.id.home_frame, new FragmentMakeDeal()).commit();
+                fragmentManager.beginTransaction().replace(R.id.home_frame, new FragmentMakeDeal().setId(EmployeeId, Image, Name, userRate)).commit();
             }
         });
     }
@@ -150,10 +152,14 @@ public class FragmentProfile extends Fragment {
                         JSONObject object1 = personalData.getJSONObject(0);
                         employee_id = object1.getInt("userId");
                         user_name.setText(object1.getString("name"));
+                        Name = object1.getString("name");
                         user_job.setText(object1.getString("job_title"));
                         user_phone.setText(object1.getString("phone"));
+                        user_rate.setRating((float)object1.getDouble("rate"));
+                        userRate = (float)object1.getDouble("rate");
                         num_projects.setText(object1.getString("numProjects"));
                         Picasso.get().load(object1.getString("image")).into(user_image);
+                        Image = object1.getString("image");
                         JSONArray array = object.getJSONArray("projectData");
                         if (array.length() > 0) {
                             for (int x = 0; x < array.length(); x++) {
