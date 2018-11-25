@@ -9,19 +9,19 @@
 
         <item
             android:id="@+id/nav_home"
-            android:icon="@drawable/ic_menu_camera"
+            android:icon="@drawable/ic_home_black_24dp"
             android:title="@string/home" />
         <item
             android:id="@+id/nav_projects"
-            android:icon="@drawable/ic_menu_gallery"
+            android:icon="@drawable/ic_menu_manage"
             android:title="@string/myprojects" />
         <item
             android:id="@+id/nav_nearest"
-            android:icon="@drawable/ic_menu_slideshow"
+            android:icon="@drawable/ic_add_location_black_24dp"
             android:title="@string/nearest" />
         <item
             android:id="@+id/nav_out"
-            android:icon="@drawable/ic_menu_manage"
+            android:icon="@drawable/ic_arrow_back_black_24dp"
             android:title="@string/logout" />
     </group>
 

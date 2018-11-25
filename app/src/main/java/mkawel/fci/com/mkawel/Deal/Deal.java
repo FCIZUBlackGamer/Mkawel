@@ -27,6 +27,7 @@ public class Deal {
         this.rateDeal = rateDeal;
     }
 
+
     public void setUserImage(String userImage) {
         this.userImage = userImage;
     }

@@ -76,10 +76,10 @@ public class CategoryAdapter extends BaseAdapter {
         viewHolder.action.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (type == 0)
-                fragmentManager.beginTransaction()
-                        .replace(R.id.home_frame, new FragmentHome().catOrEmployee(1)).addToBackStack("FragmentHome").commit();
-                else {
+                if (type == 0) {
+                    fragmentManager.beginTransaction()
+                            .replace(R.id.home_frame, new FragmentHome().catOrEmployee(product.getId())).addToBackStack("FragmentHome").commit();
+                }else {
                     fragmentManager.beginTransaction()
                             .replace(R.id.home_frame, new FragmentProfile().userOrEmployee(1, product.getId())).addToBackStack("FragmentProfile").commit();
                 }

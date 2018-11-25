@@ -21,9 +21,9 @@
     <string name="rate_deal">تقييم الصفقة</string>
     <string name="cancel_deal">إلغاء الصفقة</string>
     <string name="with">بواسطة :</string>
-    <string name="start_deal">ابدأ صفقة</string>
-    <string name="most_used">--- Most used categories</string>
-    <string name="available_dep">--- Available categories</string>
+    <string name="deal_details">تفاصيل</string>
+    <string name="most_used">--- الأقسام الأكثر تداول</string>
+    <string name="available_dep">--- الأقسام المتاحة</string>
     <string name="title_activity_nav">NavActivity</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -31,10 +31,10 @@
     <string name="nav_header_subtitle">android.studio@android.com</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
-    <string name="home">Home</string>
-    <string name="myprojects">My projects</string>
-    <string name="nearest">Nearest</string>
-    <string name="logout">Logout</string>
+    <string name="home">الرئيسية</string>
+    <string name="myprojects">مشاريعى</string>
+    <string name="nearest">الأقرب</string>
+    <string name="logout">تسجيل خروج</string>
     <string name="action_search_for_cat">بحث عن قسم</string>
     <string name="action_search_for_employee">بحث عن عامل</string>
     <string name="email">البريد الإلكترونى</string>
@@ -98,4 +98,10 @@
         <item>جنوب سيناء</item>
         <item>السويس</item>
     </string-array>
+    <string-array name="type">
+        <item>عامل</item>
+        <item>مستخدم</item>
+    </string-array>
+    <string name="job_title">اسم الوظيفة</string>
+    <string name="action_refresh">تحديث البيانات</string>
 </resources>

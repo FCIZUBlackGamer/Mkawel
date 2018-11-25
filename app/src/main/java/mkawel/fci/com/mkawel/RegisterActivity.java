@@ -19,6 +19,7 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -55,9 +56,9 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class RegisterActivity extends AppCompatActivity {
 
     TextView login;
-    EditText user_name, email, password, phone, address, other_cat;
+    EditText user_name, email, password, phone, address, other_cat, job_title;
     Button register;
-    Spinner cap, category;
+    Spinner cap, category, type;
     CircleImageView user_image;
     private int PICK_IMAGE_REQUEST = 1;
     final int CAMERA_PIC_REQUEST = 1337;
@@ -66,6 +67,7 @@ public class RegisterActivity extends AppCompatActivity {
     Bitmap bitmap;
     List<Spin> spinList;
     List<String> stringList;
+    String cat_state, catId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +84,11 @@ public class RegisterActivity extends AppCompatActivity {
         other_cat = findViewById(R.id.other_cat);
         login = findViewById(R.id.login);
         user_image = findViewById(R.id.user_image);
+        job_title = findViewById(R.id.job_title);
+        type = findViewById(R.id.type);
+        other_cat.setVisibility(View.GONE);
+        stringList = new ArrayList<>();
+        spinList = new ArrayList<>();
 
         requestStoragePermission();
         login.setOnClickListener(new View.OnClickListener() {
@@ -92,6 +99,30 @@ public class RegisterActivity extends AppCompatActivity {
         });
 
         loadSpinnerData();
+
+        category.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (category.getSelectedItem().equals("أخرى")) {
+                    cat_state = "0";
+                    other_cat.setVisibility(View.VISIBLE);
+                } else {
+                    cat_state = "1";
+                    other_cat.setVisibility(View.GONE);
+                    for (int x = 0; x < spinList.size(); x++) {
+                        if (spinList.get(x).getValue().equals(category.getSelectedItem().toString())) {
+                            catId = spinList.get(x).getId() + "";
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
         user_image.setOnClickListener(new View.OnClickListener() {
             @SuppressLint("ResourceAsColor")
             @Override
@@ -136,61 +167,87 @@ public class RegisterActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                final ProgressDialog progressDialog = new ProgressDialog(RegisterActivity.this);
-                progressDialog.setMessage("تسجيل مستخدم ...");
-                progressDialog.show();
-                StringRequest stringRequest = new StringRequest(Request.Method.POST, "http://abdelkreimahmed.000webhostapp.com/Register.php", new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        Log.e("Response", response);
-                        progressDialog.dismiss();
-                        try {
-                            JSONObject object = new JSONObject(response);
-                            if (!object.getBoolean("error")){
-                                Toast.makeText(RegisterActivity.this, "تم التسجيل بنجاح", Toast.LENGTH_SHORT).show();
-                                startActivity(new Intent(RegisterActivity.this,LoginActivity.class));
-                            }else {
-                                Toast.makeText(RegisterActivity.this, object.getString("message"), Toast.LENGTH_SHORT).show();
-                            }
-                        }catch (Exception e){
+                synchronized (this) {
+                    final ProgressDialog progressDialog = new ProgressDialog(RegisterActivity.this);
+                    progressDialog.setMessage("تسجيل مستخدم ...");
+                    progressDialog.setCancelable(false);
+                    progressDialog.show();
+                    StringRequest stringRequest = new StringRequest(Request.Method.POST, "http://abdelkreimahmed.000webhostapp.com/Register.php", new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            Log.e("Response", response);
+                            progressDialog.dismiss();
+                            try {
+                                JSONObject object = new JSONObject(response);
+                                if (!object.getBoolean("error")) {
+                                    Toast.makeText(RegisterActivity.this, "تم التسجيل بنجاح", Toast.LENGTH_SHORT).show();
+                                    startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
+                                } else {
+                                    Toast.makeText(RegisterActivity.this, object.getString("message"), Toast.LENGTH_SHORT).show();
+                                }
+                            } catch (Exception e) {
 
-                            Toast.makeText(RegisterActivity.this, "خطأ فى صيغة الاستقبال", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(RegisterActivity.this, "خطأ فى صيغة الاستقبال", Toast.LENGTH_SHORT).show();
+                            }
                         }
-                    }
-                }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        progressDialog.dismiss();
-                        if (error instanceof ServerError)
-                            Toast.makeText(RegisterActivity.this, "خطأ فى الاتصال بالخادم", Toast.LENGTH_SHORT).show();
-                        else if (error instanceof TimeoutError)
-                            Toast.makeText(RegisterActivity.this, "خطأ فى مدة الاتصال", Toast.LENGTH_SHORT).show();
-                        else if (error instanceof NetworkError)
-                            Toast.makeText(RegisterActivity.this, "شبكه الانترنت ضعيفه حاليا", Toast.LENGTH_SHORT).show();
-                    }
-                }) {
-                    @Override
-                    protected Map<String, String> getParams() throws AuthFailureError {
-                        HashMap<String, String> map = new HashMap<>();
-                        map.put("Content-Type", "application/json; charset=utf-8");
-                        map.put("user_name", user_name.getText().toString());
-                        map.put("email", email.getText().toString());
-                        map.put("password", password.getText().toString());
-                        map.put("phone", phone.getText().toString());
-                        map.put("address", address.getText().toString());
-                        map.put("capital", cap.getSelectedItem().toString());
-                        map.put("cat", cap.getSelectedItem().toString());
-                        map.put("longitude", 231564.54 + "");
-                        map.put("latitude", 231564.54 + "");
-                        map.put("userImage", final_iamge);
-                        return map;
-                    }
-                };
-                stringRequest.setRetryPolicy(new DefaultRetryPolicy(
-                        DefaultRetryPolicy.DEFAULT_TIMEOUT_MS,
-                        3,  // maxNumRetries = 2 means no retry
-                        DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-                Volley.newRequestQueue(RegisterActivity.this).add(stringRequest);
+                    }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            progressDialog.dismiss();
+                            if (error instanceof ServerError)
+                                Toast.makeText(RegisterActivity.this, "خطأ فى الاتصال بالخادم", Toast.LENGTH_SHORT).show();
+                            else if (error instanceof TimeoutError)
+                                Toast.makeText(RegisterActivity.this, "خطأ فى مدة الاتصال", Toast.LENGTH_SHORT).show();
+                            else if (error instanceof NetworkError)
+                                Toast.makeText(RegisterActivity.this, "شبكه الانترنت ضعيفه حاليا", Toast.LENGTH_SHORT).show();
+                        }
+                    }) {
+                        @Override
+                        protected Map<String, String> getParams() throws AuthFailureError {
+                            HashMap<String, String> map = new HashMap<>();
+                            map.put("Content-Type", "application/json; charset=utf-8");
+                            map.put("user_name", user_name.getText().toString());
+//                        Log.e("user_name", user_name.getText().toString());
+                            map.put("email", email.getText().toString());
+//                        Log.e("email", email.getText().toString());
+                            map.put("password", password.getText().toString());
+//                        Log.e("password", password.getText().toString());
+                            map.put("phone", phone.getText().toString());
+//                        Log.e("phone", phone.getText().toString());
+                            map.put("job_title", job_title.getText().toString());
+//                        Log.e("job_title", job_title.getText().toString());
+                            map.put("cat_state", cat_state);
+//                        Log.e("cat_state", cat_state);
+                            map.put("address", address.getText().toString());
+//                        Log.e("address", address.getText().toString());
+                            map.put("capital", cap.getSelectedItem().toString());
+//                        Log.e("capital", cap.getSelectedItem().toString());
+                            if (cat_state.equals("1")) {
+                                map.put("cat", catId);
+//                            Log.e("cat", catId);
+                            } else {
+                                map.put("cat", other_cat.getText().toString());
+//                            Log.e("cat", other_cat.getText().toString());
+                            }
+                            if (type.getSelectedItem().toString().equals("عامل")) {
+                                map.put("type", "emp");
+//                            Log.e("type", "emp");
+                            } else {
+                                map.put("type", "none");
+//                            Log.e("type", "none");
+                            }
+                            map.put("longitude", 231564.54 + "");
+                            map.put("latitude", 231564.54 + "");
+                            map.put("userImage", final_iamge);
+                            return map;
+                        }
+                    };
+                    stringRequest.setRetryPolicy(new DefaultRetryPolicy(
+                            0,
+                            DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                            DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+                    Volley.newRequestQueue(RegisterActivity.this).add(stringRequest);
+                }
             }
         });
 
@@ -207,7 +264,7 @@ public class RegisterActivity extends AppCompatActivity {
                 try {
                     JSONObject jsonObject = new JSONObject(response);
                     JSONArray array = jsonObject.getJSONArray("CatUser");
-                    if (array.length()>0){
+                    if (array.length() > 0) {
                         stringList = new ArrayList<>();
                         spinList = new ArrayList<>();
                         for (int i = 0; i < array.length(); i++) {
@@ -235,7 +292,7 @@ public class RegisterActivity extends AppCompatActivity {
             }
         });
         int socketTimeout = 30000;
-        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, 2, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, 3, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         stringRequest.setRetryPolicy(policy);
         requestQueue.add(stringRequest);
     }

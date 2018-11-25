@@ -1,14 +1,18 @@
 package mkawel.fci.com.mkawel.Employee;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,8 +42,11 @@ import java.util.List;
 import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import io.realm.Realm;
 import mkawel.fci.com.mkawel.Deal.FragmentMakeDeal;
+import mkawel.fci.com.mkawel.NavActivity;
 import mkawel.fci.com.mkawel.R;
+import mkawel.fci.com.mkawel.User;
 
 public class FragmentProfile extends Fragment {
 
@@ -59,15 +66,18 @@ public class FragmentProfile extends Fragment {
     static int Id = -1; // 0 is user, 1 is employee
     static int EmployeeId = 0;
     int employee_id = 0;
-    String Image, Name;
-    float userRate;
+    String Image, Name, CatId;
+    float userRate = 0;
 
-    public static FragmentProfile userOrEmployee(int type, int employeId){
+    final Realm realm = Realm.getDefaultInstance();
+
+    public static FragmentProfile userOrEmployee(int type, int employeId) {
         FragmentProfile profile = new FragmentProfile();
         Id = type;
         EmployeeId = employeId;
         return profile;
     }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -91,12 +101,12 @@ public class FragmentProfile extends Fragment {
     public void onStart() {
         super.onStart();
 
-        if(Id == 0){
+        if (Id == 0) {
             gridView.setVisibility(View.GONE);
             call.setVisibility(View.GONE);
             makeDeal.setVisibility(View.GONE);
             loadMyProfile();
-        }else {
+        } else {
             gridView.setVisibility(View.VISIBLE);
             call.setVisibility(View.VISIBLE);
             makeDeal.setVisibility(View.VISIBLE);
@@ -113,14 +123,20 @@ public class FragmentProfile extends Fragment {
 //
 //            }
 //        });
+
         call.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (!user_phone.getText().toString().isEmpty()) {
                     Intent callIntent = new Intent(Intent.ACTION_CALL);
                     callIntent.setData(Uri.parse("tel:" + user_phone.getText()));
-                    startActivity(callIntent);
-                }else {
+                    if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CALL_PHONE}, 1);
+                    } else {
+                        startActivity(callIntent);
+                    }
+                    //startActivity(callIntent);
+                } else {
                     Toast.makeText(getActivity(), "لا تتوفر ارقام دليل", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -129,7 +145,7 @@ public class FragmentProfile extends Fragment {
         makeDeal.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                fragmentManager.beginTransaction().replace(R.id.home_frame, new FragmentMakeDeal().setId(EmployeeId, Image, Name, userRate)).commit();
+                fragmentManager.beginTransaction().replace(R.id.home_frame, new FragmentMakeDeal().setId(EmployeeId, Image, Name, userRate, CatId)).commit();
             }
         });
     }
@@ -153,13 +169,15 @@ public class FragmentProfile extends Fragment {
                         employee_id = object1.getInt("userId");
                         user_name.setText(object1.getString("name"));
                         Name = object1.getString("name");
+                        ((NavActivity)getActivity()).setActionBarTitle(Name);
                         user_job.setText(object1.getString("job_title"));
                         user_phone.setText(object1.getString("phone"));
-                        user_rate.setRating((float)object1.getDouble("rate"));
-                        userRate = (float)object1.getDouble("rate");
+                        user_rate.setRating((float) object1.getDouble("rate"));
+                        userRate = (float) object1.getDouble("rate");
                         num_projects.setText(object1.getString("numProjects"));
                         Picasso.get().load(object1.getString("image")).into(user_image);
                         Image = object1.getString("image");
+                        CatId = object1.getString("catId");
                         JSONArray array = object.getJSONArray("projectData");
                         if (array.length() > 0) {
                             for (int x = 0; x < array.length(); x++) {
@@ -205,14 +223,67 @@ public class FragmentProfile extends Fragment {
             }
         };
         stringRequest.setRetryPolicy(new DefaultRetryPolicy(
-                DefaultRetryPolicy.DEFAULT_TIMEOUT_MS,
-                3,  // maxNumRetries = 2 means no retry
+                0,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         Volley.newRequestQueue(getActivity()).add(stringRequest);
     }
 
     private void loadMyProfile() {
         // display basic information From Internal Database
+        final User user = realm.where(User.class).findFirst();
+
+        user_name.setText(user.getName());
+        ((NavActivity)getActivity()).setActionBarTitle("الشخصية");
+        user_job.setText(user.getJob_title());
+        user_phone.setText(user.getPhone());
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, "http://abdelkreimahmed.000webhostapp.com/GetUserProfile.php", new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.e("Response", response);
+                try {
+                    JSONObject object = new JSONObject(response);
+                    JSONArray personalData = object.getJSONArray("profileData");
+                    if (personalData.length() > 0) {
+
+                        JSONObject object1 = personalData.getJSONObject(0);
+                        user_rate.setRating((float) object1.getDouble("rate"));
+                        userRate = (float) object1.getDouble("rate");
+                        num_projects.setText(object1.getString("numProjects"));
+
+
+                    } else {
+                        Toast.makeText(getActivity(), "لا توجد بيانات للعامل", Toast.LENGTH_SHORT).show();
+                    }
+
+                } catch (Exception e) {
+                    Toast.makeText(getActivity(), "صيغه استقبال غير صحيحه", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                if (error instanceof ServerError)
+                    Toast.makeText(getActivity(), "خطأ فى الاتصال بالخادم", Toast.LENGTH_SHORT).show();
+                else if (error instanceof TimeoutError)
+                    Toast.makeText(getActivity(), "خطأ فى مدة الاتصال", Toast.LENGTH_SHORT).show();
+                else if (error instanceof NetworkError)
+                    Toast.makeText(getActivity(), "شبكه الانترنت ضعيفه حاليا", Toast.LENGTH_SHORT).show();
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                HashMap<String, String> map = new HashMap<>();
+                map.put("userId", user.getUserId() + "");
+                return map;
+            }
+        };
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(
+                0,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        Volley.newRequestQueue(getActivity()).add(stringRequest);
 
     }
 }

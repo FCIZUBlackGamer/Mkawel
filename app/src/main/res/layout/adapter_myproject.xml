@@ -49,11 +49,15 @@
                 android:layout_toLeftOf="@id/user_image">
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="ewfwkenvklwenvlnkleedlvnelvblkervblkberlknvklnreklnvklnre"
                     android:id="@+id/project_name"
                     android:lines="2"
+                    android:layout_gravity="start"
+                    android:gravity="start"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
                     android:maxLines="2"
                     android:layout_marginTop="10dp"
                     android:maxLength="50"
@@ -64,6 +68,7 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:layout_gravity="end"
+                    android:layout_marginEnd="10dp"
                     android:layout_marginTop="10dp">
 
                     <TextView
@@ -71,14 +76,16 @@
                         android:layout_height="wrap_content"
                         android:text="@string/with"
                         android:maxLength="50"
+                        android:id="@id/user_name"
                         android:layout_marginEnd="10dp"/>
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/with"
-                        android:maxLength="50"
-                        android:id="@id/user_name"/>
+                        android:maxLength="50"/>
+
+
 
                 </LinearLayout>
 
@@ -95,8 +102,6 @@
                     android:rating="3"
                     android:stepSize="1" />
 
-
-
             </LinearLayout>
 
             <Button
@@ -107,7 +112,7 @@
                 android:background="#9377d8"
                 android:layout_below="@id/lin"
                 android:id="@+id/start_deal"
-                android:text="@string/start_deal"
+                android:text="@string/deal_details"
                 android:textColor="#fff"
                 android:layout_marginEnd="5dp"
                 android:layout_marginBottom="10dp"/>
