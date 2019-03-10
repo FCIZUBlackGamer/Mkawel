@@ -1,11 +1,17 @@
 package mkawel.fci.com.mkawel.Employee;
 
 import android.Manifest;
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -13,10 +19,14 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -36,6 +46,7 @@ import com.squareup.picasso.Picasso;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -44,9 +55,13 @@ import java.util.Map;
 import de.hdodenhof.circleimageview.CircleImageView;
 import io.realm.Realm;
 import mkawel.fci.com.mkawel.Deal.FragmentMakeDeal;
+import mkawel.fci.com.mkawel.LoginActivity;
 import mkawel.fci.com.mkawel.NavActivity;
 import mkawel.fci.com.mkawel.R;
+import mkawel.fci.com.mkawel.RegisterActivity;
 import mkawel.fci.com.mkawel.User;
+
+import static android.app.Activity.RESULT_OK;
 
 public class FragmentProfile extends Fragment {
 
@@ -61,13 +76,26 @@ public class FragmentProfile extends Fragment {
     List<Project> categories;
     View view;
 
-    FloatingActionButton call, makeDeal;
+    FloatingActionButton call, makeDeal, edit;
     FragmentManager fragmentManager;
     static int Id = -1; // 0 is user, 1 is employee
     static int EmployeeId = 0;
     int employee_id = 0;
     String Image, Name, CatId;
     float userRate = 0;
+
+    //Edit Views
+    EditText ed_name, ed_phone, ed_address, ed_jobTitle, ed_password;
+    Button btn_save;
+    CircleImageView civ_user_image;
+    ImageView iv_cancel;
+    private int PICK_IMAGE_REQUEST = 1;
+    final int CAMERA_PIC_REQUEST = 1337;
+    private static final int CAMERA_REQUEST = 1888;
+    String final_iamge;
+    Bitmap bitmap;
+    int cam_state = 0;
+    User edit_user = new User();
 
     final Realm realm = Realm.getDefaultInstance();
 
@@ -89,6 +117,7 @@ public class FragmentProfile extends Fragment {
         user_rate = view.findViewById(R.id.user_rate);
         num_projects = view.findViewById(R.id.num_projects);
         call = view.findViewById(R.id.call);
+        edit = view.findViewById(R.id.edit);
         makeDeal = view.findViewById(R.id.make_deal);
         gridView = (mkawel.fci.com.mkawel.Employee.ExpandableHeightGridView) view.findViewById(R.id.cat_grid);
         gridView.setExpanded(true);
@@ -101,28 +130,121 @@ public class FragmentProfile extends Fragment {
     public void onStart() {
         super.onStart();
 
+        requestStoragePermission();
+
         if (Id == 0) {
             gridView.setVisibility(View.GONE);
             call.setVisibility(View.GONE);
             makeDeal.setVisibility(View.GONE);
+            edit.setVisibility(View.VISIBLE);
             loadMyProfile();
         } else {
             gridView.setVisibility(View.VISIBLE);
             call.setVisibility(View.VISIBLE);
             makeDeal.setVisibility(View.VISIBLE);
+            edit.setVisibility(View.GONE);
             loadEmployeeProfile(EmployeeId);
         }
 
 
-//        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                Project c = categories.get(position);
-////                fragmentManager.beginTransaction()
-////                        .replace(R.id.frame_home, new FragmentProductDetails().setId(book.getId(),0)).addToBackStack("FragmentOfferDetails").commit();
-//
-//            }
-//        });
+        edit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                View view;
+                LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                view = inflater.inflate(R.layout.popup_edit_profile, null);
+                //ed_address = view.findViewById(R.id.ed_address);
+                ed_name = view.findViewById(R.id.ed_name);
+                ed_jobTitle = view.findViewById(R.id.ed_jobTitle);
+                ed_password = view.findViewById(R.id.ed_password);
+                ed_phone = view.findViewById(R.id.ed_phone);
+                iv_cancel = view.findViewById(R.id.iv_cancel);
+                civ_user_image = view.findViewById(R.id.civ_user_image);
+                btn_save = view.findViewById(R.id.btn_save);
+
+                civ_user_image.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        final LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+                        View Camera_view = inflater.inflate(R.layout.camera_view, null);
+
+                        ImageView cam = Camera_view.findViewById(R.id.cam);
+                        ImageView gal = Camera_view.findViewById(R.id.gal);
+
+                        final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                        builder.setCancelable(false)
+                                .setView(Camera_view);
+
+                        final AlertDialog dialog = builder.create();
+                        dialog.show();
+
+                        gal.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                openGalary();
+                                dialog.dismiss();
+                            }
+                        });
+
+                        cam.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                openCamera();
+                                dialog.dismiss();
+                            }
+                        });
+                    }
+                });
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setView(view)
+                        .setNegativeButton("اغلاق", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                ViewGroup parent = (ViewGroup) view.getParent();
+                                if (parent != null) {
+                                    parent.removeAllViews();
+                                }
+                                dialog.dismiss();
+                            }
+                        });
+
+                AlertDialog dialog = builder.create();
+                dialog.show();
+
+                iv_cancel.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        ViewGroup parent = (ViewGroup) view.getParent();
+                        if (parent != null) {
+                            parent.removeAllViews();
+                        }
+                        dialog.dismiss();
+                    }
+                });
+
+                btn_save.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        edit_user.setJob_title(ed_jobTitle.getText().toString());
+                        edit_user.setPhone(ed_phone.getText().toString());
+                        edit_user.setName(ed_name.getText().toString());
+                        edit_user.setPassword(ed_password.getText().toString());
+                        if (cam_state != 0){
+                            edit_user.setImage(final_iamge);
+                        }
+                        updateMyProfile(edit_user);
+                        ViewGroup parent = (ViewGroup) view.getParent();
+                        if (parent != null) {
+                            parent.removeAllViews();
+                        }
+                        dialog.dismiss();
+                    }
+                });
+
+            }
+        });
 
         call.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -286,4 +408,121 @@ public class FragmentProfile extends Fragment {
         Volley.newRequestQueue(getActivity()).add(stringRequest);
 
     }
+
+    private void updateMyProfile(User edit_user) {
+
+        final User user = realm.where(User.class).findFirst();
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, "http://abdelkreimahmed.000webhostapp.com/EditProf.php", new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.e("Response", response);
+                try {
+                    JSONObject object = new JSONObject(response);
+                    if (!object.getBoolean("error")) {
+                        Toast.makeText(getActivity(), "تم التعديل بنجاح", Toast.LENGTH_SHORT).show();
+
+                    } else {
+                        Toast.makeText(getActivity(), object.getString("message"), Toast.LENGTH_SHORT).show();
+                    }
+
+                } catch (Exception e) {
+                    Toast.makeText(getActivity(), "صيغه استقبال غير صحيحه", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                if (error instanceof ServerError)
+                    Toast.makeText(getActivity(), "خطأ فى الاتصال بالخادم", Toast.LENGTH_SHORT).show();
+                else if (error instanceof TimeoutError)
+                    Toast.makeText(getActivity(), "خطأ فى مدة الاتصال", Toast.LENGTH_SHORT).show();
+                else if (error instanceof NetworkError)
+                    Toast.makeText(getActivity(), "شبكه الانترنت ضعيفه حاليا", Toast.LENGTH_SHORT).show();
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                HashMap<String, String> map = new HashMap<>();
+                map.put("user_name", edit_user.getName() + "");
+                map.put("userId", user.getUserId() + "");
+                map.put("password", edit_user.getPassword() + "");
+                map.put("phone", edit_user.getPhone() + "");
+                map.put("job_title", edit_user.getJob_title() + "");
+                if (cam_state != 0){
+                    map.put("userImage", edit_user.getImage());
+                }
+                return map;
+            }
+        };
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(
+                0,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        Volley.newRequestQueue(getActivity()).add(stringRequest);
+
+    }
+
+    private void openGalary() {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
+    }
+
+    private void openCamera() {
+        //Todo: Open Camera
+
+        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivityForResult(cameraIntent, CAMERA_REQUEST);
+
+    }
+
+    //Requesting permission
+    private void requestStoragePermission() {
+        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)
+            return;
+
+        if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE)) {
+            //If the user has denied the permission previously your code will come to this block
+            //Here you can explain why you need this permission
+            //Explain here why you need this permission
+        }
+        //And finally ask for the permission
+        ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 123);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Uri filePath;
+
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
+            filePath = data.getData();
+            try {
+                //Getting the Bitmap from Gallery
+                bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), filePath);
+                user_image.setImageBitmap(bitmap);
+                final_iamge = getStringImage(bitmap);
+                cam_state = 1;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else if (requestCode == CAMERA_REQUEST && resultCode == RESULT_OK) {
+            bitmap = (Bitmap) data.getExtras().get("data");
+            user_image.setImageBitmap(bitmap);
+            final_iamge = getStringImage(bitmap);
+            cam_state = 1;
+        }
+    }
+
+    public String getStringImage(Bitmap bmp) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bmp.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        byte[] imageBytes = baos.toByteArray();
+        String encodedImage = Base64.encodeToString(imageBytes, Base64.DEFAULT);
+        return encodedImage;
+    }
+
+
 }

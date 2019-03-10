@@ -5,7 +5,42 @@ import io.realm.RealmObject;
 public class User extends RealmObject {
 
     int userId, catId;
-    String name, image, cap, job_title, phone, type;
+    String name;
+    String image;
+    String cap;
+    String job_title;
+    String phone;
+    String type;
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+
+    public void setCatId(int catId) {
+        this.catId = catId;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public void setCap(String cap) {
+        this.cap = cap;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    String password;
     float rate;
 
     public User() {

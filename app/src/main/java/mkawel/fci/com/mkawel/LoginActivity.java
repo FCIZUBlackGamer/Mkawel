@@ -3,11 +3,13 @@ package mkawel.fci.com.mkawel;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -94,7 +96,7 @@ public class LoginActivity extends AppCompatActivity {
                                         user.setPhone(jsonObject.getString("phone"));
                                         user.setType(jsonObject.getString("type"));
                                         realm.beginTransaction();
-                                        realm.copyToRealm(user);
+                                        realm.insertOrUpdate(user);
                                         realm.commitTransaction();
                                     }
                                     Intent intent = new Intent(LoginActivity.this, NavActivity.class);
@@ -154,15 +156,19 @@ public class LoginActivity extends AppCompatActivity {
         forget_pass.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                EditText editText = new EditText(LoginActivity.this);
+                View view;
+                LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                view = inflater.inflate(R.layout.popup_forget_password, null);
+
+                EditText editText = view.findViewById(R.id.editText);
                 editText.setHint("ادخل بريدك الالكترونى");
                 AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
-                builder.setView(editText)
+                builder.setView(view)
                         .setPositiveButton("موافق", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 final ProgressDialog progressDialog = new ProgressDialog(LoginActivity.this);
-                                progressDialog.setMessage("جارى إلغاء الصفقة ...");
+                                progressDialog.setMessage("جارى ارسال كلمة المرور الى البريد الالكترنى المختار ...");
                                 progressDialog.setCancelable(false);
                                 progressDialog.show();
                                 StringRequest stringRequest = new StringRequest(Request.Method.POST, "http://abdelkreimahmed.000webhostapp.com/ForgetPass.php", new Response.Listener<String>() {
@@ -172,8 +178,8 @@ public class LoginActivity extends AppCompatActivity {
                                         Log.e("Response", response);
                                         progressDialog.dismiss();
                                         try {
-                                            JSONObject object = new JSONObject(response);
-                                            Toast.makeText(LoginActivity.this, object.getString("res"), Toast.LENGTH_SHORT).show();
+                                            //JSONObject object = new JSONObject(response);
+                                            Toast.makeText(LoginActivity.this, response, Toast.LENGTH_SHORT).show();
 
                                         } catch (Exception e) {
 
@@ -221,10 +227,6 @@ public class LoginActivity extends AppCompatActivity {
                         dialog.dismiss();
                     }
                 }).show();
-                ViewGroup parent = (ViewGroup) editText.getParent();
-                if (parent != null) {
-                    parent.removeAllViews();
-                }
             }
         });
     }
