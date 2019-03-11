@@ -46,6 +46,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import io.realm.Realm;
 import io.realm.RealmResults;
 import mkawel.fci.com.mkawel.Deal.FragmentListDeals;
+import mkawel.fci.com.mkawel.Employee.FragmentProfile;
 import mkawel.fci.com.mkawel.Home.Category;
 import mkawel.fci.com.mkawel.Home.FragmentHome;
 
@@ -58,6 +59,8 @@ public class NavActivity extends AppCompatActivity
     TextView user_name, user_job;
     String name, image, job, cap;
     User user;
+    int userId, type;
+    DrawerLayout drawer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,6 +96,11 @@ public class NavActivity extends AppCompatActivity
                 job = user.getJob_title();
                 image = user.getImage();
                 cap = user.getCap();
+                userId = user.getUserId();
+                if (user.getType().equals("emp"))
+                    type = 1;
+                else
+                    type = 0;
             }
         });
 
@@ -100,11 +108,47 @@ public class NavActivity extends AppCompatActivity
         user_job.setText(job);
         user_name.setText(name);
 
+        realm.beginTransaction();
+        user = realm.where(User.class).findFirst();
+        realm.commitTransaction();
+        user_image.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                opClo();
+                fragmentManager.beginTransaction().replace(R.id.home_frame, FragmentProfile.setUser(user)).commit();
+            }
+        });
+        user_job.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                opClo();
+                fragmentManager.beginTransaction().replace(R.id.home_frame, FragmentProfile.setUser(user)).commit();
+            }
+        });
+        user_name.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                opClo();
+                fragmentManager.beginTransaction().replace(R.id.home_frame, FragmentProfile.setUser(user)).commit();
+            }
+        });
+
     }
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer == null)
+            drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    private void opClo() {
+        if (drawer == null)
+            drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -169,7 +213,7 @@ public class NavActivity extends AppCompatActivity
                                                     jsonObject.getString("catName"));
                                             categories.add(category);
                                         }
-                                        Log.e("Size",categories.size()+"");
+                                        Log.e("Size", categories.size() + "");
                                         fragmentManager.beginTransaction().replace(R.id.home_frame, new FragmentHome().loadCat(-1, categories)).commit();
                                     } else {
                                         Toast.makeText(NavActivity.this, "لا توجد اقسام متشابهه", Toast.LENGTH_SHORT).show();
@@ -308,10 +352,9 @@ public class NavActivity extends AppCompatActivity
                     });
             final AlertDialog dialog2 = builder.create();
             dialog2.show();
-        } else if (id == R.id.action_refresh){
+        } else if (id == R.id.action_refresh) {
             fragmentManager.beginTransaction().replace(R.id.home_frame, new FragmentHome()).commit();
         }
-
 
 
         return super.onOptionsItemSelected(item);
@@ -338,7 +381,7 @@ public class NavActivity extends AppCompatActivity
                 public void execute(Realm realm) {
                     RealmResults<User> result = realm.where(User.class).findAll();
                     result.deleteAllFromRealm();
-                    startActivity(new Intent(NavActivity.this,LoginActivity.class));
+                    startActivity(new Intent(NavActivity.this, LoginActivity.class));
                 }
             });
         }

@@ -78,11 +78,12 @@ public class FragmentProfile extends Fragment {
 
     FloatingActionButton call, makeDeal, edit;
     FragmentManager fragmentManager;
-    static int Id = -1; // 0 is user, 1 is employee
+    static int Id = 0; // 0 is user, 1 is employee
     static int EmployeeId = 0;
     int employee_id = 0;
     String Image, Name, CatId;
     float userRate = 0;
+
 
     //Edit Views
     EditText ed_name, ed_phone, ed_address, ed_jobTitle, ed_password;
@@ -96,6 +97,7 @@ public class FragmentProfile extends Fragment {
     Bitmap bitmap;
     int cam_state = 0;
     User edit_user = new User();
+    static User user = null;
 
     final Realm realm = Realm.getDefaultInstance();
 
@@ -103,6 +105,12 @@ public class FragmentProfile extends Fragment {
         FragmentProfile profile = new FragmentProfile();
         Id = type;
         EmployeeId = employeId;
+        return profile;
+    }
+
+    public static FragmentProfile setUser(User u) {
+        FragmentProfile profile = new FragmentProfile();
+        user = u;
         return profile;
     }
 
@@ -132,7 +140,7 @@ public class FragmentProfile extends Fragment {
 
         requestStoragePermission();
 
-        if (Id == 0) {
+        if (user != null) {
             gridView.setVisibility(View.GONE);
             call.setVisibility(View.GONE);
             makeDeal.setVisibility(View.GONE);
@@ -161,6 +169,14 @@ public class FragmentProfile extends Fragment {
                 iv_cancel = view.findViewById(R.id.iv_cancel);
                 civ_user_image = view.findViewById(R.id.civ_user_image);
                 btn_save = view.findViewById(R.id.btn_save);
+
+                ed_name.setText(user.getName());
+                ed_jobTitle.setText(user.getJob_title());
+                ed_password.setText(user.getPassword());
+                ed_phone.setText(user.getPhone());
+                if (user.getImage()!=null && !user.getImage().isEmpty()){
+                    Picasso.get().load(user.getImage()).into(civ_user_image);
+                }
 
                 civ_user_image.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -353,12 +369,13 @@ public class FragmentProfile extends Fragment {
 
     private void loadMyProfile() {
         // display basic information From Internal Database
-        final User user = realm.where(User.class).findFirst();
 
+        if (user != null){
         user_name.setText(user.getName());
         ((NavActivity)getActivity()).setActionBarTitle("الشخصية");
         user_job.setText(user.getJob_title());
         user_phone.setText(user.getPhone());
+        }
 
         StringRequest stringRequest = new StringRequest(Request.Method.POST, "http://abdelkreimahmed.000webhostapp.com/GetUserProfile.php", new Response.Listener<String>() {
             @Override
