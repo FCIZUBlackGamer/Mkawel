@@ -300,7 +300,7 @@ public class FragmentHome extends Fragment {
         });
         stringRequest.setRetryPolicy(new DefaultRetryPolicy(
                 DefaultRetryPolicy.DEFAULT_TIMEOUT_MS,
-                3,  // maxNumRetries = 2 means no retry
+                5,  // maxNumRetries = 2 means no retry
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         Volley.newRequestQueue(getActivity()).add(stringRequest);
     }
